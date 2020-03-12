@@ -41,14 +41,17 @@ function updateHighScore(score) {
 
 function checkAnswer(choice, answer) {
     console.log('Answer is: ', choice === answer);
+    var response = "";
     if (choice === answer) {
         thisScore += 10;
+        response = "Correct!";
     } else {
         time -= 10;
+        response = "Wrong!";
     }
     console.log('highScore', highScore);
     updateHighScore(thisScore);
-
+    document.getElementById ("answer").innerText = response;
     startQuiz();
 }
 
@@ -83,10 +86,36 @@ function displayQuestion(question, questionPosition) {
     document.getElementById("choices").innerHTML = liList;
 }
 
-function handleInitials(initials) {
-    console.log('handling initials');
-    document.getElementById("initials");
+function goBack(){
+    time = 0;
+    questionPosition = 0;
+    timerStarted = false;
+    var restart = "<h3>Coding Quiz Challenge</h3>";
+    restart += "<p id=\"question\">Try to answer the following code-related questions with the time limit.Keep in mind that incorrect answers will penalize your scoretime by ten seconds! <br></p>";
+    restart += "<ol id=\"choices\"></ol>";
+    restart += "<button id=\"startButton\" onclick=\"startQuiz();\">Start Quiz</button>";
 
+    document.getElementById("content").innerHTML = restart;
+}
+
+function clearScores (){
+    thisScore = 0;
+    document.getElementById("gameOver").style = "display: none;";
+}
+
+function handleInitials() {
+    console.log('handling initials');
+    var initials = document.getElementById("initials").value;
+    var gameOver = "<h3>Highscores</h3>";
+    gameOver += "<p id='gameOver'>1. ";
+    gameOver += initials;
+    gameOver += " - ";
+    gameOver += thisScore;
+    gameOver += "</p>";
+    gameOver += "<button onclick=\"goBack();\">Go Back</button>";
+    gameOver += "<button onclick=\"clearScores();\">Clear Highscores</button>";
+
+    document.getElementById("content").innerHTML = gameOver;
 }
 
 function displayAllDone() {
@@ -95,12 +124,12 @@ function displayAllDone() {
     allDone += thisScore;
     allDone += "</p><label for='initials'>Enter Initials:</label>";
     allDone += "<input id='initials' type='text'>";
-    allDone += "<button onclick=\"handleInitials('initials')\">Submit</button>";
+    allDone += "<button onclick=\"handleInitials();\">Submit</button>";
     
-    console.log("all done: ", allDone);
     document.getElementById("content").innerHTML = allDone;
 }
 
+var timerInterval = {};
 function startQuiz() {
     console.log('startquiz');
     var question = {};
@@ -114,7 +143,7 @@ function startQuiz() {
         if (timerStarted === false)  {
            timerStarted = true;
            time = 75;
-           setInterval(timer, 1000);
+           timerInterval = setInterval(timer, 1000);
            console.log("timerstarted");  
        
        }
@@ -123,6 +152,7 @@ function startQuiz() {
     } else {
         console.log('Ran out of questions');
         displayAllDone();
+        clearInterval(timerInterval);
         return;
     }
     questionPosition++;
